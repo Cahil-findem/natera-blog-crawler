@@ -1,15 +1,16 @@
 """
-Vercel serverless entry point for Natera Blog Crawler
+Vercel serverless function entry point
 """
-
 import sys
-from pathlib import Path
+from os.path import dirname, abspath
 
-# Add parent directory to path to import app module
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add parent directory to Python path
+root_dir = dirname(dirname(abspath(__file__)))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
 
-from app import app
+# Import the Flask app
+from app import app as application
 
-# Export the Flask app for Vercel
-# Vercel looks for a variable that can handle requests
-handler = app
+# Vercel will use this as the serverless function handler
+app = application
