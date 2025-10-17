@@ -905,7 +905,7 @@ def process_candidate():
             'professional_summary': summaries['professional_summary'],
             'job_preferences': summaries['job_preferences'],
             'interests': summaries['interests'],
-            'news_matches': format_news_response(top_news),
+            'blog_matches': format_news_response(top_news),
             'email': email_content,
             'timestamp': datetime.now().isoformat()
         }
@@ -1181,7 +1181,7 @@ def generate_email():
             'professional_summary': professional_summary,
             'job_preferences': job_preferences,
             'interests': interests,
-            'news_matches': format_news_response(top_news),
+            'blog_matches': format_news_response(top_news),
             'email': email_content,
             'timestamp': datetime.now().isoformat()
         }

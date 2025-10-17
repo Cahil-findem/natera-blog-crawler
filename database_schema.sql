@@ -187,17 +187,17 @@ BEGIN
     ),
     chunk_similarities AS (
         SELECT
-            n.id,
-            n.title,
-            n.url,
-            n.author,
-            n.featured_image,
-            chunk->>'text' AS chunk_text,
+            n.id AS article_id,
+            n.title AS article_title,
+            n.url AS article_url,
+            n.author AS article_author,
+            n.featured_image AS article_image,
+            chunk->>'text' AS text_content,
             (chunk->>'chunk_index')::INTEGER AS chunk_idx,
             cosine_similarity(
                 ce.professional_summary_embedding,
                 embedding->'embedding'
-            ) AS sim
+            ) AS sim_score
         FROM natera_news n
         CROSS JOIN candidate_embedding ce
         CROSS JOIN LATERAL jsonb_array_elements(n.chunks) AS chunk
@@ -205,17 +205,17 @@ BEGIN
         WHERE (chunk->>'chunk_index')::INTEGER = (embedding->>'chunk_index')::INTEGER
     )
     SELECT
-        id,
-        title,
-        url,
-        author,
-        featured_image,
-        chunk_text,
-        chunk_idx,
-        sim
-    FROM chunk_similarities
-    WHERE sim >= p_match_threshold
-    ORDER BY sim DESC
+        cs.article_id,
+        cs.article_title,
+        cs.article_url,
+        cs.article_author,
+        cs.article_image,
+        cs.text_content,
+        cs.chunk_idx,
+        cs.sim_score
+    FROM chunk_similarities cs
+    WHERE cs.sim_score >= p_match_threshold
+    ORDER BY cs.sim_score DESC
     LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql;
