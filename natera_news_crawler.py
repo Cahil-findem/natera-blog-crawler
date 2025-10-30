@@ -232,39 +232,45 @@ def store_article(article):
     print(f"Created {len(chunks)} chunks for: {article['title']}")
 
     # Generate embeddings for each chunk
+    chunks_with_embeddings = []
     chunk_embeddings = []
+
     for i, chunk in enumerate(chunks):
+        print(f"  Generating embedding for chunk {i+1}/{len(chunks)}...")
         embedding = generate_embedding(chunk['text'])
-        chunk_embeddings.append({
-            'chunk_index': i,
+
+        # Store chunk data
+        chunks_with_embeddings.append({
             'text': chunk['text'],
-            'embedding': embedding,
+            'chunk_index': i,
             'token_count': chunk['token_count']
         })
+
+        # Store embedding separately
+        chunk_embeddings.append({
+            'embedding': embedding,
+            'chunk_index': i
+        })
+
         time.sleep(0.1)  # Rate limiting
 
-    # Store in database
-    data = {
+    # Store article with chunks and embeddings as JSONB
+    article_data = {
         'title': article['title'],
         'url': article['url'],
         'content': article['content'],
         'author': article['author'],
         'published_date': article['published_date'].isoformat() if article['published_date'] else None,
         'featured_image': article['featured_image'],
-        'chunks': json.dumps([{
-            'chunk_index': c['chunk_index'],
-            'text': c['text'],
-            'token_count': c['token_count']
-        } for c in chunk_embeddings]),
-        'chunk_embeddings': json.dumps([{
-            'chunk_index': c['chunk_index'],
-            'embedding': c['embedding']
-        } for c in chunk_embeddings])
+        'chunks': chunks_with_embeddings,
+        'chunk_embeddings': chunk_embeddings
     }
 
-    result = supabase.table('natera_news').insert(data).execute()
-    print(f"✅ Stored article: {article['title']}")
-    return result.data[0]['id']
+    result = supabase.table('natera_news').insert(article_data).execute()
+    news_id = result.data[0]['id']
+
+    print(f"✅ Stored article with {len(chunks)} chunks: {article['title']}")
+    return news_id
 
 
 def main(limit=10):
@@ -308,4 +314,7 @@ def main(limit=10):
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    # Allow passing limit as command line argument, default to 50
+    limit = int(sys.argv[1]) if len(sys.argv) > 1 else 50
+    main(limit=limit)

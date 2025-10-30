@@ -101,9 +101,9 @@ class CandidateNewsMatcher:
             List of matching news articles with similarity scores
         """
         try:
-            # Use the RPC function from database_schema.sql
+            # Use the optimized fast RPC function
             result = self.supabase.rpc(
-                'search_news_for_candidate',
+                'search_news_for_candidate_fast',
                 {
                     'p_candidate_id': candidate_id,
                     'p_match_threshold': match_threshold,

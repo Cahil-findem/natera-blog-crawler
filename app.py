@@ -249,10 +249,10 @@ def match_news_for_candidate_internal(candidate_id):
     try:
         logger.info(f"Finding news matches for {candidate_id}...")
 
-        # Get initial matches
+        # Get initial matches (lowered threshold to find any matches)
         news_matches = matcher.find_news_for_candidate(
             candidate_id,
-            match_threshold=0.25,
+            match_threshold=0.15,
             match_count=30,
             deduplicate=True
         )
@@ -879,7 +879,8 @@ def process_candidate():
         logger.info("Finding matching news articles using three-embedding search...")
         top_news = match_news_for_candidate_internal(candidate_id)
         if not top_news:
-            return jsonify({'error': 'No matching news articles found.'}), 404
+            logger.warning("No matching news articles found, continuing without news...")
+            top_news = []  # Continue with empty list instead of failing
 
         # Step 4.5: Match candidate to open jobs
         logger.info("Matching candidate to open jobs...")
@@ -906,13 +907,10 @@ def process_candidate():
             'job_preferences': summaries['job_preferences'],
             'interests': summaries['interests'],
             'blog_matches': format_news_response(top_news),
+            'job_matches': job_matches if job_matches else [],  # Always include, empty array if no matches
             'email': email_content,
             'timestamp': datetime.now().isoformat()
         }
-
-        # Only include job_matches if there are actual matches
-        if job_matches:
-            response['job_matches'] = job_matches
 
         logger.info("Successfully processed candidate with three-field embeddings!")
         return jsonify(response)
@@ -1182,13 +1180,10 @@ def generate_email():
             'job_preferences': job_preferences,
             'interests': interests,
             'blog_matches': format_news_response(top_news),
+            'job_matches': job_matches if job_matches else [],  # Always include, empty array if no matches
             'email': email_content,
             'timestamp': datetime.now().isoformat()
         }
-
-        # Only include job_matches if there are actual matches
-        if job_matches:
-            response['job_matches'] = job_matches
 
         logger.info("Successfully generated email!")
         return jsonify(response)

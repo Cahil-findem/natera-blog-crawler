@@ -480,6 +480,7 @@
 }'></textarea>
                 <div class="button-group">
                     <button class="btn btn-primary" id="generateBtn">Generate Email ✨</button>
+                    <button class="btn btn-secondary" id="loadTestBtn">Load Test Profile</button>
                     <button class="btn btn-secondary" id="clearBtn">Clear</button>
                 </div>
             </div>
@@ -558,6 +559,7 @@
     <script>
         const candidateInput = document.getElementById('candidateInput');
         const generateBtn = document.getElementById('generateBtn');
+        const loadTestBtn = document.getElementById('loadTestBtn');
         const clearBtn = document.getElementById('clearBtn');
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
@@ -574,6 +576,160 @@
         let currentSemanticSummary = null;
         let iterationCount = 0;
         let contextHistoryItems = [];
+
+        // Test profile data
+        const testProfile = {
+            "ref": "pub_5d984f6178b4d04f6244fa78",
+            "skills": [
+                    "Customer Service",
+                    "Nursing",
+                    "Accounting",
+                    "Human Resources",
+                    "Hospitality",
+                    "CPR Certified",
+                    "Hospitals",
+                    "Cardiac Nursing",
+                    "Intra Aortic Balloon Pump",
+                    "CRRT",
+                    "Impella",
+                    "Neurosurgery Nursing",
+                    "Medical Intensive Care",
+                    "Intra-Aortic Balloon Pump (IABP)",
+                    "Cardiothoracic Surgical Nursing",
+                    "Cardiovascular Intensive Care Nursing",
+                    "Heart Transplant",
+                    "Lung Transplantation"
+                ],
+                "education": [
+                    {
+                        "school_info": {
+                            "name": "State University of New York at Delhi",
+                            "domain": null,
+                            "lnkd_school_id": "state-university-of-new-york-at-delhi",
+                            "lnkd_school_src_id": null
+                        },
+                        "education_details": {
+                            "degree": [
+                                "Bachelor's degree"
+                            ],
+                            "major": [
+                                " Registered Nursing/Registered Nurse"
+                            ],
+                            "projects": [],
+                            "courses": [],
+                            "skills": [],
+                            "grades": "",
+                            "description": ""
+                        },
+                        "misc": [],
+                        "duration": {
+                            "start_date": "2015-01-01T00:00:00.000Z",
+                            "end_date": "2019-01-01T00:00:00.000Z"
+                        }
+                    }
+                ],
+                "workexp": [
+                    {
+                        "company": {
+                            "company_id": "5b0c4a983200621bdb33a750",
+                            "name": "Stanford Health Care",
+                            "lnkd_company_id": "stanford-health-care",
+                            "lnkd_company_src_id": null,
+                            "location": "Palo Alto, California, United States",
+                            "location_parsed": {
+                                "city": "Palo Alto",
+                                "state": "California",
+                                "country": "United States",
+                                "state_short": "CA",
+                                "country_short": "US"
+                            },
+                            "logo": "li_stanford-health-care"
+                        },
+                        "skills": [],
+                        "projects": [
+                            {
+                                "project_type": "Industry",
+                                "role_and_group": {
+                                    "title": "Registered Nurse"
+                                },
+                                "description": null,
+                                "misc": {
+                                    "contributors": []
+                                }
+                            }
+                        ],
+                        "duration": {
+                            "start_date": "2022-12-01T00:00:00.000Z",
+                            "end_date": null,
+                            "to_present": true
+                        }
+                    },
+                    {
+                        "company": {
+                            "company_id": "5b0c4ad93200621bdb537bda",
+                            "name": "Kaiser Permanente",
+                            "lnkd_company_id": "kaiser-permanente",
+                            "lnkd_company_src_id": null,
+                            "location": "San Jose",
+                            "location_parsed": {
+                                "city": "San Jose",
+                                "state": "California",
+                                "country": "United States",
+                                "state_short": "CA",
+                                "country_short": "US"
+                            },
+                            "logo": "li_kaiser-permanente"
+                        },
+                        "skills": [],
+                        "projects": [
+                            {
+                                "project_type": "Industry",
+                                "role_and_group": {
+                                    "title": "RN"
+                                },
+                                "description": "Intensive Care Unit, RN II",
+                                "misc": {
+                                    "contributors": []
+                                }
+                            }
+                        ],
+                        "duration": {
+                            "start_date": "2016-11-01T00:00:00.000Z",
+                            "end_date": null,
+                            "to_present": true
+                        }
+                    }
+                ],
+                "candidate": {
+                    "full_name": "Ozgur Acar",
+                    "other_contacts": [],
+                    "linkedin": "https://www.linkedin.com/in/ozgur-acar-94940256",
+                    "location_raw": "San Jose, California, United States",
+                    "location": {
+                        "city": "San Jose",
+                        "state": "California",
+                        "country": "United States"
+                    },
+                    "title": "Registered Nurse at Stanford Healthcare Hospital - Palo Alto, CA",
+                    "about_me": "After 5 years of Accounting experience with a Bachelor's degree in Business in Turkey, I moved to the U.S. in 2008 to begin a new career in Nursing. I graduated with my Nursing degree at CUNY, NYC College of Technology with Honors awards. Recently earned my BSN degree at SUNY- Delhi.",
+                    "num_connections": 106,
+                    "gender": "Male"
+                }
+        };
+
+        // Load test profile button
+        loadTestBtn.addEventListener('click', () => {
+            candidateInput.value = JSON.stringify(testProfile, null, 4);
+            error.classList.remove('active');
+            // Optionally show a brief success message
+            const originalText = loadTestBtn.textContent;
+            loadTestBtn.textContent = '✓ Loaded!';
+            loadTestBtn.style.background = '#4caf50';
+            setTimeout(() => {
+                loadTestBtn.textContent = originalText;
+                loadTestBtn.style.background = '';
+            }, 1500);
+        });
 
         // Clear button
         clearBtn.addEventListener('click', () => {
@@ -658,7 +814,8 @@
 
         // Display result
         function displayResult(data, isRegeneration = false) {
-            const { candidate, professional_summary, job_preferences, interests, news_matches, email } = data;
+            const { candidate, professional_summary, job_preferences, interests, blog_matches, email } = data;
+            const news_matches = blog_matches || [];  // Use blog_matches from API, fallback to empty array
 
             // Store state for regeneration
             currentCandidateId = candidate.id;
