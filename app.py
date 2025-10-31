@@ -574,7 +574,7 @@ def generate_email_content(candidate_info, news_recommendations, semantic_summar
         news_list.append({
             'title': article['news_title'],
             'url': article['news_url'],
-            'featured_image': 'https://natera-blog-crawler.vercel.app/images/natera-brand.png',
+            'featured_image': 'https://natera-blog-crawler.vercel.app/images/Natera-social.webp',
             'excerpt': article.get('best_matching_chunk', '')[:200]
         })
 
@@ -694,7 +694,7 @@ NEWS SECTION FORMAT (keep this HTML structure exactly - justification first, the
   </div>
 </div>
 
-[Repeat for each news article - ALWAYS use this Natera brand image: https://natera-blog-crawler.vercel.app/images/natera-brand.png]
+[Repeat for each news article - ALWAYS use this Natera brand image: https://natera-blog-crawler.vercel.app/images/Natera-social.webp]
 
 CLOSING EXAMPLES (warm and genuine):
 - "Would love to catch up sometime if you're open to it — always enjoy talking shop."
@@ -794,7 +794,7 @@ def format_news_response(news_articles):
         {
             'title': article['news_title'],
             'url': article['news_url'],
-            'featured_image': 'https://natera-blog-crawler.vercel.app/images/natera-brand.png',
+            'featured_image': 'https://natera-blog-crawler.vercel.app/images/Natera-social.webp',
             'relevance': round(article.get('max_similarity', 0) * 100, 1),
             'author': article.get('news_author', ''),
             'excerpt': article.get('best_matching_chunk', '')[:200] + '...'
