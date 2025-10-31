@@ -574,7 +574,7 @@ def generate_email_content(candidate_info, news_recommendations, semantic_summar
         news_list.append({
             'title': article['news_title'],
             'url': article['news_url'],
-            'featured_image': article.get('news_featured_image', 'https://via.placeholder.com/200x120/2563eb/ffffff?text=News'),
+            'featured_image': 'https://www.natera.com/wp-content/uploads/2022/12/Natera_Logo-1.png',
             'excerpt': article.get('best_matching_chunk', '')[:200]
         })
 
@@ -694,7 +694,7 @@ NEWS SECTION FORMAT (keep this HTML structure exactly - justification first, the
   </div>
 </div>
 
-[Repeat for each news article - use featured_image from article data, or use placeholder: https://via.placeholder.com/200x120/2563eb/ffffff?text=News]
+[Repeat for each news article - ALWAYS use this Natera brand image: https://www.natera.com/wp-content/uploads/2022/12/Natera_Logo-1.png]
 
 CLOSING EXAMPLES (warm and genuine):
 - "Would love to catch up sometime if you're open to it — always enjoy talking shop."
@@ -794,7 +794,7 @@ def format_news_response(news_articles):
         {
             'title': article['news_title'],
             'url': article['news_url'],
-            'featured_image': article.get('news_featured_image', ''),
+            'featured_image': 'https://www.natera.com/wp-content/uploads/2022/12/Natera_Logo-1.png',
             'relevance': round(article.get('max_similarity', 0) * 100, 1),
             'author': article.get('news_author', ''),
             'excerpt': article.get('best_matching_chunk', '')[:200] + '...'
