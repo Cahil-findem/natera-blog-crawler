@@ -655,12 +655,22 @@ def generate_email_content(candidate_info, news_recommendations, semantic_summar
     job_list = []
     if job_matches:
         for job in job_matches:
+            # Format compensation (handle None values)
+            comp_min = job.get('compensation_min')
+            comp_max = job.get('compensation_max')
+            comp_currency = job.get('compensation_currency', '')
+
+            if comp_min and comp_max:
+                compensation = f"{comp_currency} {comp_min:,.0f} - {comp_max:,.0f}".strip()
+            else:
+                compensation = "Not specified"
+
             job_list.append({
                 'position': job['position'],
                 'company': job.get('company', ''),
                 'location_type': job.get('location_type', ''),
                 'location': f"{job.get('location_city', '')}, {job.get('location_country', '')}".strip(', '),
-                'compensation': f"{job.get('compensation_currency', '')} {job.get('compensation_min', 0):,.0f} - {job.get('compensation_max', 0):,.0f}",
+                'compensation': compensation,
                 'about_role': job.get('about_role', '')[:250],
                 'application_link': job.get('application_link', ''),
                 'match_score': f"{job.get('similarity', 0) * 100:.0f}%"
