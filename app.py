@@ -785,17 +785,11 @@ NEWS TRANSITION (ONLY if news articles are provided):
 - If news articles exist and no jobs: "I came across a few pieces recently and thought they might resonate with you:"
 - If NO news articles, skip this section entirely and go straight to closing
 
-NEWS SECTION FORMAT (keep this HTML structure exactly - justification first, then image and title):
+NEWS SECTION FORMAT (keep this HTML structure exactly - full-width image on top, then title and description):
 <div style="margin-bottom: 24px;">
-  <p style="margin: 0; padding: 0 0 12px 0; font-size: 16px; color: #1f2937; line-height: 1.6;">[One personal sentence about why THIS person would find this valuable — connect it to their specific experience or interests.]</p>
-  <div style="display: flex; gap: 16px; align-items: flex-start; margin: 0; padding: 0;">
-    <a href="[NEWS_URL]" style="flex-shrink: 0; display: block; line-height: 0;">
-      <img src="[FEATURED_IMAGE_URL]" alt="[NEWS_TITLE]" style="width: 200px; height: 120px; object-fit: cover; border-radius: 8px; display: block;">
-    </a>
-    <div style="flex: 1; min-width: 0;">
-      <a href="[NEWS_URL]" style="font-size: 16px; font-weight: 600; color: #2563eb; text-decoration: none; display: block;">[NEWS_TITLE]</a>
-    </div>
-  </div>
+  <img src="https://natera-blog-crawler.vercel.app/images/Natera-social.webp" alt="[NEWS_TITLE]" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px; margin-bottom: 12px;">
+  <a href="[NEWS_URL]" style="font-size: 16px; font-weight: 600; color: #2563eb; text-decoration: none;">[NEWS_TITLE]</a>
+  <p style="margin-top: 8px; font-size: 14px; color: #6b7280; line-height: 1.6;">[One personal sentence about why THIS person would find this valuable — connect it to their specific experience or interests.]</p>
 </div>
 
 [Repeat for each news article - ALWAYS use this Natera brand image: https://natera-blog-crawler.vercel.app/images/Natera-social.webp]
