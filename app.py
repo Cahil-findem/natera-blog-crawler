@@ -241,15 +241,65 @@ def vectorize_candidate_summaries(candidate_data, summaries):
         return False
 
 
+def get_priority_articles(candidate_id):
+    """
+    Internal: Get manually prioritized articles for a candidate
+    Returns: list of priority news articles in priority order
+    """
+    try:
+        supabase = matcher.supabase
+
+        # Get priority articles for this candidate (ordered by priority)
+        result = supabase.table('candidate_priority_articles')\
+            .select('news_id, priority, natera_news(*)')\
+            .eq('candidate_id', candidate_id)\
+            .order('priority')\
+            .execute()
+
+        if not result.data:
+            return []
+
+        # Format as news matches
+        priority_news = []
+        for item in result.data:
+            news = item.get('natera_news')
+            if news:
+                # Find best matching chunk (use first chunk for priority articles)
+                chunks = json.loads(news.get('chunks', '[]')) if isinstance(news.get('chunks'), str) else news.get('chunks', [])
+                best_chunk = chunks[0]['text'] if chunks else ''
+
+                priority_news.append({
+                    'news_id': news['id'],
+                    'news_title': news['title'],
+                    'news_url': news['url'],
+                    'news_author': news.get('author', 'Natera'),
+                    'news_featured_image': news.get('featured_image', ''),
+                    'best_matching_chunk': best_chunk,
+                    'max_similarity': 1.0,  # Priority articles get perfect score
+                    'is_priority': True
+                })
+
+        logger.info(f"Found {len(priority_news)} priority articles for {candidate_id}")
+        return priority_news
+
+    except Exception as e:
+        logger.error(f"Error getting priority articles: {str(e)}")
+        return []
+
+
 def match_news_for_candidate_internal(candidate_id):
     """
     Internal: Find matching news articles for a candidate
+    Includes priority articles + semantic matches
     Returns: list of diverse news matches (top 3)
     """
     try:
         logger.info(f"Finding news matches for {candidate_id}...")
 
-        # Get initial matches (lowered threshold to find any matches)
+        # Step 1: Get priority articles for this candidate
+        priority_articles = get_priority_articles(candidate_id)
+
+        # Step 2: Get semantic matches (lowered threshold to find any matches)
         news_matches = matcher.find_news_for_candidate(
             candidate_id,
             match_threshold=0.15,
@@ -257,12 +307,35 @@ def match_news_for_candidate_internal(candidate_id):
             deduplicate=True
         )
 
-        if not news_matches:
+        if not news_matches and not priority_articles:
             return []
 
-        # Filter for diversity
-        top_news = filter_diverse_news(news_matches)
-        logger.info(f"Found {len(news_matches)} matches, selected {len(top_news)} diverse articles")
+        # Step 3: Merge priority articles with semantic matches
+        # Priority articles always go first
+        all_matches = priority_articles + news_matches
+
+        # Step 4: Remove duplicates (keep first occurrence - priority articles)
+        seen_urls = set()
+        unique_matches = []
+        for article in all_matches:
+            url = article['news_url']
+            if url not in seen_urls:
+                seen_urls.add(url)
+                unique_matches.append(article)
+
+        # Step 5: Filter for diversity (but keep all priority articles)
+        num_priority = len(priority_articles)
+        if num_priority >= 3:
+            # All priority articles, no semantic matches needed
+            top_news = priority_articles[:3]
+        else:
+            # Keep all priority articles + fill remaining slots with diverse semantic matches
+            remaining_slots = 3 - num_priority
+            semantic_only = [a for a in unique_matches if a not in priority_articles]
+            diverse_semantic = filter_diverse_news(semantic_only, count=remaining_slots)
+            top_news = priority_articles + diverse_semantic
+
+        logger.info(f"Found {num_priority} priority articles + {len(news_matches)} semantic matches, selected {len(top_news)} total")
 
         return top_news
     except Exception as e:
