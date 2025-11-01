@@ -696,7 +696,7 @@ Matching Job Openings (if any):
 {json.dumps(job_list, indent=2) if job_list else 'No matching jobs found'}
 
 Recommended News Articles:
-{json.dumps(news_list, indent=2)}
+{json.dumps(news_list, indent=2) if news_list else 'No matching news articles found'}
 """
 
     # Use LLM to generate the email
@@ -756,13 +756,13 @@ QUESTION EXAMPLES (sound genuinely curious):
 - Keep it subtle and conversational, like: "By the way, we have a <a href="..." style="color: #2563eb; text-decoration: none;">Senior Bioinformatics Scientist</a> opening that might be interesting given your background in [relevant experience]."
 - Or: "I also wanted to mention we're hiring for a <a href="..." style="color: #2563eb; text-decoration: none;">[Job Title]</a> role — thought it might align with where you're headed."
 - Maximum 1-2 sentences mentioning jobs, woven naturally into a paragraph
-- After mentioning jobs (if any), transition naturally to news articles
+- After mentioning jobs (if any), transition naturally to news articles IF news articles exist
 
-NEWS TRANSITION (make it natural):
-- If jobs were mentioned: "I also came across a few pieces recently that reminded me of you:"
-- If no jobs: "I came across a few pieces recently and thought they might resonate with you:"
-- "Thought you might find these interesting given your work in [domain]:"
-- "Been reading a few things that reminded me of you:"
+NEWS TRANSITION (ONLY if news articles are provided):
+- Check context: If "Recommended News Articles" says "No matching news articles found", DO NOT include news section at all
+- If news articles exist and jobs were mentioned: "I also came across a few pieces recently that reminded me of you:"
+- If news articles exist and no jobs: "I came across a few pieces recently and thought they might resonate with you:"
+- If NO news articles, skip this section entirely and go straight to closing
 
 NEWS SECTION FORMAT (keep this HTML structure exactly - justification first, then image and title):
 <div style="margin-bottom: 24px;">
@@ -1237,14 +1237,16 @@ def generate_email():
         # Match news
         logger.info("Finding matching news articles...")
         top_news = match_news_for_candidate_internal(candidate_id)
-        if not top_news:
-            return jsonify({'error': 'No matching news articles found.'}), 404
 
         # Match candidate to open jobs
         logger.info("Matching candidate to open jobs...")
         job_matches = match_candidate_to_jobs(candidate_id, match_threshold=0.35)
 
-        # Generate email
+        # Check if we have either news or jobs (need at least one)
+        if not top_news and not job_matches:
+            return jsonify({'error': 'No matching news articles or job openings found.'}), 404
+
+        # Generate email (works with news, jobs, or both)
         logger.info("Generating email...")
         email_content = generate_email_content(candidate_info, top_news, combined_summary, job_matches=job_matches)
 
