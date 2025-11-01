@@ -749,14 +749,35 @@ QUESTION EXAMPLES (sound genuinely curious):
 - "Have you been thinking about [next level/direction], or are you still loving [current focus]?"
 
 **MENTIONING JOB OPENINGS** (ONLY if matching jobs are provided in context):
-- If the context includes "Matching Job Openings" with actual job data, weave them naturally into your conversational text
+- If the context includes "Matching Job Openings" with actual job data, mention them conversationally
 - Never mention jobs if no matches exist (context says "No matching jobs found")
-- Don't create a separate section or card - integrate job mentions into the natural flow of the email
-- Make the job title a clickable link using: <a href="[APPLICATION_LINK]" style="color: #2563eb; text-decoration: none;">[POSITION_TITLE]</a>
-- Keep it subtle and conversational, like: "By the way, we have a <a href="..." style="color: #2563eb; text-decoration: none;">Senior Bioinformatics Scientist</a> opening that might be interesting given your background in [relevant experience]."
-- Or: "I also wanted to mention we're hiring for a <a href="..." style="color: #2563eb; text-decoration: none;">[Job Title]</a> role — thought it might align with where you're headed."
-- Maximum 1-2 sentences mentioning jobs, woven naturally into a paragraph
-- After mentioning jobs (if any), transition naturally to news articles IF news articles exist
+- Add a brief natural transition like: "By the way, we have a [position] opening that might align with your background." or "I also wanted to mention we're hiring for a [position] role — thought it might be worth exploring."
+- Keep the transition subtle (1-2 sentences max)
+- AFTER the transition, include job card(s) using this EXACT HTML structure:
+
+<div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0; background: #ffffff;">
+  <h2 style="margin: 0 0 8px 0; font-size: 18px; color: #1f2937; font-weight: 600;">
+    <a href="[APPLICATION_LINK]" style="color: #2563eb; text-decoration: none;">[POSITION_TITLE]</a>
+  </h2>
+  <div style="color: #6b7280; font-size: 14px; margin-bottom: 8px;">
+    <strong style="color: #374151;">[COMPANY]</strong> • [LOCATION_TYPE] • [LOCATION_CITY], [LOCATION_COUNTRY]
+  </div>
+  <div style="color: #059669; font-size: 14px; font-weight: 600; margin-bottom: 10px;">
+    [COMPENSATION] (or omit this div entirely if compensation is "Not specified")
+  </div>
+  <p style="color: #374151; font-size: 15px; line-height: 1.5; margin: 0 0 10px 0;">
+    [ABOUT_ROLE - truncate to ~150 characters]
+  </p>
+  <div style="margin-top: 12px;">
+    <a href="[APPLICATION_LINK]" style="display: inline-block; background: #2563eb; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;">
+      View Full Details
+    </a>
+  </div>
+</div>
+
+[Repeat card for each job opening - maximum 2 cards]
+
+- After job cards (if any), transition naturally to news articles IF news articles exist
 
 NEWS TRANSITION (ONLY if news articles are provided):
 - Check context: If "Recommended News Articles" says "No matching news articles found", DO NOT include news section at all
@@ -790,12 +811,15 @@ Sign-off: "Best,"
 CRITICAL RULES:
 - NO subject line in the email body (will be generated separately)
 - NO signature name after "Best," - just "Best,"
-- Under 180 words before news sections
+- Under 180 words before news/job sections
 - Sound like a real person reaching out, not a templated message
-- Use HTML formatting for news sections EXACTLY as shown
-- For jobs: Weave naturally into text with job titles as hyperlinks (NO cards or separate sections)
+- Use HTML formatting for job cards and news sections EXACTLY as shown
+- For jobs: Brief conversational transition, then styled job card(s)
 - ONLY mention jobs if matching jobs exist in the context
 - NEVER mention jobs if context says "No matching jobs found"
+- Omit compensation div if compensation is "Not specified"
+- Truncate about_role to ~150 characters in job cards
+- Maximum 2 job cards
 - Make both job and news justifications PERSONAL to this specific person
 - Each email should feel like it was written just for them"""
 
