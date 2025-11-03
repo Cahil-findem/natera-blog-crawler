@@ -772,9 +772,10 @@ STRUCTURE:
 
 OPENING:
 - GREETING LINE: "Hi [Name],"
-- BRIEF LEAD-IN: 1-2 sentences about why this role caught your attention for them
-- Example: "I came across a [position] role that seems like it could be a great fit for your background in [domain]."
-- Example: "Given your experience with [technology/domain], I thought you might be interested in this [position] opportunity."
+- BRIEF LEAD-IN: 1-2 sentences about the role availability, avoiding assumptions about candidate fit
+- Example: "We just posted a [position] role and I thought you might be interested."
+- Example: "I wanted to share a [position] opportunity that recently opened up."
+- Example: "A [position] role came across my desk and I thought of you."
 
 JOB CARDS: Use this EXACT HTML structure:
 
