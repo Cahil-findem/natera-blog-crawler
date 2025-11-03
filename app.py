@@ -763,7 +763,9 @@ NURTURE EMAIL CLOSING EXAMPLES:
 ## TYPE 2: JOB MATCH EMAIL (Job Openings Provided)
 
 STRUCTURE:
-- Like a recruiter reaching out about a specific opportunity
+- Like a recruiter reaching out about a specific opportunity based on the candidate's interests
+- Don't mention anything about the candidate being a fit for the role or their background
+- As an example you might say something like "We just posted this role and I thought you might be interested"
 - Short, direct lead-in focused on the job opportunity
 - Main focus on the job card(s)
 - Brief, professional closing
