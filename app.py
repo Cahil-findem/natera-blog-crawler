@@ -700,25 +700,31 @@ Recommended News Articles:
 """
 
     # Use LLM to generate the email
-    system_prompt = """You are writing a warm, personal email to someone in your professional network — like reaching out to a talented friend or former colleague you genuinely respect.
+    system_prompt = """You are writing emails to professionals in your network. There are TWO types of emails you might create:
 
-Your goal is to make this feel like a real, thoughtful message from someone who's been thinking about them and their career.
+**TYPE 1: NURTURE EMAIL (No Job Openings)**
+For general relationship building and sharing relevant content.
 
-TONE & STYLE:
+**TYPE 2: JOB MATCH EMAIL (Job Openings Provided)**
+For surfacing specific job opportunities that match their background.
+
+TONE & STYLE (Both Types):
 - Warm, genuine, and conversational — like talking to someone you actually know
 - Friendly but still professional — you're a peer who cares about their growth
 - Personal touches matter — reference specific things about THEIR journey
 - Sound human, not corporate
 - No emojis, but you can be warm and friendly in your language
 
+## TYPE 1: NURTURE EMAIL (No Job Openings)
+
 STRUCTURE:
 - Total length: Under 180 words (excluding news sections)
 - GREETING LINE: ALWAYS start with a greeting on its own line using their first name: "Hi [Name]," or "Hey [Name],"
 - FIRST PARAGRAPH: A warm, personal observation about something specific in their background (1-2 sentences max)
 - SECOND PARAGRAPH: Ask a genuine question that shows you care about their path forward (1-2 sentences)
-- **IF MATCHING JOBS EXIST**: Weave job opening mentions naturally into the conversation (1-2 sentences max, with linked job titles)
 - THIRD PARAGRAPH: Share the news articles as "came across these and thought of you"
 - Close with one warm, inviting sentence
+- NEVER mention jobs if no matching jobs are found
 
 OPENING EXAMPLES (greeting on its own line, then paragraphs):
 
@@ -748,12 +754,27 @@ QUESTION EXAMPLES (sound genuinely curious):
 - "What's pulling you forward right now — [aspect A] or [aspect B]?"
 - "Have you been thinking about [next level/direction], or are you still loving [current focus]?"
 
-**MENTIONING JOB OPENINGS** (ONLY if matching jobs are provided in context):
-- If the context includes "Matching Job Openings" with actual job data, mention them conversationally
-- Never mention jobs if no matches exist (context says "No matching jobs found")
-- Add a brief natural transition like: "By the way, we have a [position] opening that might align with your background." or "I also wanted to mention we're hiring for a [position] role — thought it might be worth exploring."
-- Keep the transition subtle (1-2 sentences max)
-- AFTER the transition, include job card(s) using this EXACT HTML structure:
+NURTURE EMAIL CLOSING EXAMPLES:
+- "Would love to catch up sometime if you're open to it — always enjoy talking shop."
+- "If you ever want to grab coffee (virtual or otherwise) and talk through next steps, I'm here."
+- "Let's connect soon — I'd love to hear what you're thinking about."
+- "Happy to be a sounding board anytime if you want to chat about where things are headed."
+
+## TYPE 2: JOB MATCH EMAIL (Job Openings Provided)
+
+STRUCTURE:
+- Like a recruiter reaching out about a specific opportunity
+- Short, direct lead-in focused on the job opportunity
+- Main focus on the job card(s)
+- Brief, professional closing
+
+OPENING:
+- GREETING LINE: "Hi [Name],"
+- BRIEF LEAD-IN: 1-2 sentences about why this role caught your attention for them
+- Example: "I came across a [position] role that seems like it could be a great fit for your background in [domain]."
+- Example: "Given your experience with [technology/domain], I thought you might be interested in this [position] opportunity."
+
+JOB CARDS: Use this EXACT HTML structure:
 
 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0; background: #ffffff;">
   <h2 style="margin: 0 0 8px 0; font-size: 18px; color: #1f2937; font-weight: 600;">
@@ -777,7 +798,10 @@ QUESTION EXAMPLES (sound genuinely curious):
 
 [Repeat card for each job opening - maximum 2 cards]
 
-- After job cards (if any), transition naturally to news articles IF news articles exist
+JOB MATCH EMAIL CLOSING:
+- "Let me know if you're interested or have any questions."
+
+## SHARED RULES (Both Email Types):
 
 NEWS TRANSITION (ONLY if news articles are provided):
 - Check context: If "Recommended News Articles" says "No matching news articles found", DO NOT include news section at all
@@ -794,28 +818,24 @@ NEWS SECTION FORMAT (keep this HTML structure exactly - full-width image on top,
 
 [Repeat for each news article - ALWAYS use this Natera brand image: https://natera-blog-crawler.vercel.app/images/Natera-social.webp]
 
-CLOSING EXAMPLES (warm and genuine):
-- "Would love to catch up sometime if you're open to it — always enjoy talking shop."
-- "If you ever want to grab coffee (virtual or otherwise) and talk through next steps, I'm here."
-- "Let's connect soon — I'd love to hear what you're thinking about."
-- "Happy to be a sounding board anytime if you want to chat about where things are headed."
-
 Sign-off: "Best,"
 
 CRITICAL RULES:
 - NO subject line in the email body (will be generated separately)
 - NO signature name after "Best," - just "Best,"
-- Under 180 words before news/job sections
 - Sound like a real person reaching out, not a templated message
 - Use HTML formatting for job cards and news sections EXACTLY as shown
-- For jobs: Brief conversational transition, then styled job card(s)
 - ONLY mention jobs if matching jobs exist in the context
 - NEVER mention jobs if context says "No matching jobs found"
 - Omit compensation div if compensation is "Not specified"
 - Truncate about_role to ~150 characters in job cards
 - Maximum 2 job cards
 - Make both job and news justifications PERSONAL to this specific person
-- Each email should feel like it was written just for them"""
+- Each email should feel like it was written just for them
+
+DETERMINE EMAIL TYPE:
+- If job_list[] contains job openings: Create TYPE 2 (Job Match Email)
+- If job_list[] is empty: Create TYPE 1 (Nurture Email)"""
 
     try:
         response = openai_client.chat.completions.create(
@@ -831,7 +851,26 @@ CRITICAL RULES:
         email_body = response.choices[0].message.content.strip()
 
         # Generate subject line separately for better control
-        subject_prompt = f"""Generate a warm, personal subject line for {first_name}, a {current_title} at {current_company}.
+        # Determine if this is a job match email or nurture email
+        has_jobs = bool(job_list)
+        
+        if has_jobs:
+            # Job match email subject line
+            primary_position = job_list[0]['position']  # Use first job position
+            subject_prompt = f"""Generate a professional subject line for a recruiter reaching out to {first_name} about a specific {primary_position} opportunity.
+
+Job Position: {primary_position}
+
+Style examples (include the position title):
+- "{primary_position} opportunity for you, {first_name}"
+- "{first_name}, {primary_position} role that caught my eye"
+- "Thought you'd be interested: {primary_position} opening"
+- "{primary_position} position - would love to connect, {first_name}"
+
+Keep it under 60 characters, no quotation marks, use title case."""
+        else:
+            # Nurture email subject line
+            subject_prompt = f"""Generate a warm, personal subject line for {first_name}, a {current_title} at {current_company}.
 
 It should feel like you're reaching out to someone you know and respect — personal, not salesy.
 
